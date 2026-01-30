@@ -192,6 +192,7 @@ namespace Gecode { namespace Search { namespace Par {
     virtual Space* next(void);
     /// Check whether engine has been stopped. A stopped engine can be restarted
     virtual bool stopped(void) const;
+    /// Check whether engine will always immediately be stopped
     virtual bool willStopImmediately(void) const;
     //@}
   };

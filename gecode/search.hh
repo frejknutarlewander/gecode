@@ -930,6 +930,7 @@ namespace Gecode { namespace Search {
     virtual Statistics statistics(void) const = 0;
     /// Check whether engine has been stopped. A stopped engine can be restarted
     virtual bool stopped(void) const = 0;
+    /// Check whether engine will always immediately be stopped
     virtual bool willStopImmediately(void) const;
     /// Constrain future solutions to be better than \a b (raises exception)
     virtual void constrain(const Space& b);
@@ -966,7 +967,7 @@ namespace Gecode { namespace Search {
     virtual Statistics statistics(void) const;
     /// Check whether engine has been stopped. A stopped engine can be restarted
     virtual bool stopped(void) const;
-
+    /// Check whether engine will always immediately be stopped
     virtual bool willStopImmediately(void) const;
     /// Destructor
     virtual ~Base(void);

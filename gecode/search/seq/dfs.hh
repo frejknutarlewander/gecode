@@ -68,7 +68,7 @@ namespace Gecode { namespace Search { namespace Seq {
     void reset(Space* s);
     /// Return no-goods
     NoGoods& nogoods(void);
-
+    /// Check whether worker will always immediately be stopped
     bool willStopImmediately(void) const;
     /// Destructor
     ~DFS(void);

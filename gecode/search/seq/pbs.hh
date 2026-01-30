@@ -87,7 +87,7 @@ namespace Gecode { namespace Search { namespace Seq {
     Statistics statistics(void) const;
     /// Check whether slave has been stopped
     bool stopped(void) const;
-
+    /// Check whether slave will always immediately be stopped
     bool willStopImmediately(void) const;
     /// Constrain with better solution \a b
     void constrain(const Space& b);
@@ -125,7 +125,7 @@ namespace Gecode { namespace Search { namespace Seq {
     virtual Statistics statistics(void) const;
     /// Check whether engine has been stopped. A stopped engine can be restarted
     virtual bool stopped(void) const;
-
+    /// Check whether engine will always immediately be stopped
     virtual bool willStopImmediately(void) const;
     /// Constrain future solutions to be better than \a b
     virtual void constrain(const Space& b);
