@@ -827,7 +827,7 @@ namespace Test {
                                       c_d, a_d, t);
               new DFS<HasSolutions>(HTB_NONE, HTB_NONE, HTB_NONE,
                                     c_d, a_d, t);
-          }
+            }
 
         // Limited discrepancy search
         for (unsigned int t = 1; t<=4; t++) {
@@ -861,7 +861,7 @@ namespace Test {
             }
         // Restart-based search
         for (unsigned int t=1; t<=4; t++) {
-        (void) new RBS<HasSolutions,Gecode::DFS>("DFS",t);
+          (void) new RBS<HasSolutions,Gecode::DFS>("DFS",t);
           (void) new RBS<HasSolutions,Gecode::LDS>("LDS",t);
           (void) new RBS<HasSolutions,Gecode::BAB>("BAB",t);
           (void) new RBS<FailImmediate,Gecode::DFS>("DFS",t);
