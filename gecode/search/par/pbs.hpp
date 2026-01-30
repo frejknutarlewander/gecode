@@ -138,6 +138,11 @@ namespace Gecode { namespace Search { namespace Par {
     return slave->stopped();
   }
   template<class Collect>
+  forceinline bool
+  Slave<Collect>::willStopImmediately(void) const {
+    return (stop != nullptr && stop->alwaysStops()) || slave->willStopImmediately();
+  }
+  template<class Collect>
   forceinline void
   Slave<Collect>::constrain(const Space& b) {
     slave->constrain(b);
@@ -178,15 +183,16 @@ namespace Gecode { namespace Search { namespace Par {
     } else if (slave->stopped()) {
       if (!tostop)
         slave_stop = true;
-    } else {
-      // Move slave to inactive, as it has exhausted its engine
+    }
+    if ((s == nullptr) && (!slave->stopped() || slave->willStopImmediately())) {
+      // Move slave to inactive, as it has exhausted its engine or will always stop
       unsigned int i=0;
       while (slaves[i] != slave)
         i++;
       assert(i < n_active);
       assert(n_active > 0);
       std::swap(slaves[i],slaves[--n_active]);
-      tostop = true;
+      tostop |= (s == nullptr) && !slave->stopped();
     }
     if (b) {
       if (--n_busy == 0)
@@ -255,6 +261,12 @@ namespace Gecode { namespace Search { namespace Par {
   bool
   PBS<Collect>::stopped(void) const {
     return slave_stop;
+  }
+
+  template<class Collect>
+  bool
+  PBS<Collect>::willStopImmediately(void) const {
+    return n_active == 0;
   }
 
   template<class Collect>

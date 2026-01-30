@@ -35,6 +35,10 @@
 
 namespace Gecode { namespace Search {
 
+  bool
+  Engine::willStopImmediately(void) const {
+    return false;
+  }
   void
   Engine::constrain(const Space& b) {
     (void) b;

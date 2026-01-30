@@ -42,6 +42,11 @@ namespace Gecode { namespace Search {
   forceinline
   Stop::~Stop(void) {}
 
+  forceinline bool
+  Stop::alwaysStops(void) const {
+    return false;
+  }
+
 
   /*
    * Stopping for node limit

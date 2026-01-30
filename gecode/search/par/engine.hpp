@@ -227,6 +227,12 @@ namespace Gecode { namespace Search { namespace Par {
     // Now all threads are terminated!
   }
 
+  template<class Tracer>
+  forceinline bool
+  Engine<Tracer>::willStopImmediately(void) const {
+    return (_opt.stop != nullptr) && _opt.stop->alwaysStops();
+  }
+
   /*
    * Engine: reset control
    */

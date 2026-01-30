@@ -308,6 +308,18 @@ namespace Test {
       }
     };
 
+    class TestStop : public Gecode::Search::FailStop {
+    public:
+      bool _as;
+      explicit TestStop(unsigned long long int l) : Gecode::Search::FailStop(l), _as(l == 0) {}
+      bool stop(const Gecode::Search::Statistics& s, const Gecode::Search::Options& o) override {
+        return _as || FailStop::stop(s, o);
+      }
+      bool alwaysStops() const override {
+        return _as || FailStop::alwaysStops();
+      }
+    };
+
     /// %Base class for search tests
     class Test : public Base {
     public:
@@ -516,6 +528,49 @@ namespace Test {
       }
     };
 
+    /// %Test for restart-based search without cutoff, mimicking RBS combined with large neighborhood search.
+    template<class Model, template<class> class Engine>
+    class RBSNoCutoff : public Test {
+    private:
+      /// Number of threads
+      unsigned int t;
+    public:
+      /// Initialize test
+      RBSNoCutoff(const std::string& e, unsigned int t0)
+        : Test("RBS::NoCutoff::"+e+"::"+Model::name()+"::"+str(t0),
+               HTB_BINARY,HTB_BINARY,HTB_BINARY), t(t0) {}
+      /// Run test
+      virtual bool run(void) {
+        Model* m = new Model(htb1,htb2,htb3);
+        TestStop f(0);
+        Gecode::Search::Options o;
+        o.threads = t;
+        o.stop = &f;
+        o.d_l = 100;
+        o.cutoff = Gecode::Search::Cutoff::geometric(0,0);
+        Gecode::RBS<Model,Engine> rbs(m,o);
+        delete m;
+        for (unsigned int i=0U; i<5; i++) {
+          Model* s = rbs.next();
+          if (s != nullptr) {
+            delete s;
+            if (i > 0) {
+              return false;
+            }
+          }
+          // rbs.stopped() == true indicates that the engine can be restarted (that additional search can be performed)
+          if ((s != nullptr) && rbs.stopped()) {
+            return false;
+          }
+          // rbs.willStopImmediately() == true indicates that any restart of the engine will immediately be stopped
+          if (!rbs.willStopImmediately()) {
+            return false;
+          }
+        }
+        return true;
+      }
+    };
+
     /// %Test for portfolio-based search
     template<class Model, template<class> class Engine>
     class PBS : public Test {
@@ -647,6 +702,57 @@ namespace Test {
       }
     };
 
+    /// %Test for portfolio-based search
+    template<class Model, template<class> class Engine>
+    class PBSRBS : public Test {
+    private:
+      /// Whether best solution search is used
+      bool best;
+      /// Number of assets
+      unsigned int a;
+      /// Number of threads
+      unsigned int t;
+      /// Stop is always considered stopped
+      bool alwaysStop;
+    public:
+      /// Initialize test
+      PBSRBS(const std::string& e, bool b, unsigned int a0, unsigned int t0,
+          unsigned int stopped)
+        : Test("PBS::RBS::"+e+"::"+Model::name()+"::"+str(a0)+
+               "::"+str(t0)+"::"+str(stopped),
+               HTB_BINARY,HTB_BINARY,HTB_BINARY), best(b), a(a0), t(t0), alwaysStop(stopped) {}
+      /// Run test
+      virtual bool run(void) {
+        Model* m = new Model(htb1,htb2,htb3);
+
+        Gecode::Search::Options o, rbs_o;
+        o.assets = rbs_o.assets = a;
+        o.threads = rbs_o.threads = t;
+        o.d_l = rbs_o.d_l = 100;
+        TestStop f(alwaysStop ? 0 : 0);
+        o.stop = rbs_o.stop = &f;
+        rbs_o.cutoff = Gecode::Search::Cutoff::geometric(0,0);
+        SEBs sebs(2);
+        sebs[0] = rbs<Model,Engine>(rbs_o);
+        if (best) {
+          sebs[1] = bab<Model>(o);
+          Gecode::PBS<Model,BAB> pbs(m, sebs, o);
+          Model* b = nullptr;
+          for (unsigned int i = 0U; i <= 1; ++i) {
+            Space* s = pbs.next();
+            if ((s == nullptr) && !pbs.stopped())
+              break;
+            if (pbs.willStopImmediately())
+              break;
+            if (i == 1) {
+              return false;
+            }
+          }
+        }
+        return true;
+      }
+    };
+
     /// Iterator for branching types
     class BranchTypes {
     private:
@@ -721,7 +827,7 @@ namespace Test {
                                       c_d, a_d, t);
               new DFS<HasSolutions>(HTB_NONE, HTB_NONE, HTB_NONE,
                                     c_d, a_d, t);
-            }
+          }
 
         // Limited discrepancy search
         for (unsigned int t = 1; t<=4; t++) {
@@ -755,7 +861,7 @@ namespace Test {
             }
         // Restart-based search
         for (unsigned int t=1; t<=4; t++) {
-          (void) new RBS<HasSolutions,Gecode::DFS>("DFS",t);
+        (void) new RBS<HasSolutions,Gecode::DFS>("DFS",t);
           (void) new RBS<HasSolutions,Gecode::LDS>("LDS",t);
           (void) new RBS<HasSolutions,Gecode::BAB>("BAB",t);
           (void) new RBS<FailImmediate,Gecode::DFS>("DFS",t);
@@ -764,6 +870,13 @@ namespace Test {
           (void) new RBS<SolveImmediate,Gecode::DFS>("DFS",t);
           (void) new RBS<SolveImmediate,Gecode::LDS>("LDS",t);
           (void) new RBS<SolveImmediate,Gecode::BAB>("BAB",t);
+
+          (void) new RBSNoCutoff<HasSolutions,Gecode::DFS>("DFS",t);
+          (void) new RBSNoCutoff<HasSolutions,Gecode::LDS>("LDS",t);
+          (void) new RBSNoCutoff<HasSolutions,Gecode::BAB>("BAB",t);
+          (void) new RBSNoCutoff<SolveImmediate,Gecode::DFS>("DFS",t);
+          (void) new RBSNoCutoff<SolveImmediate,Gecode::LDS>("LDS",t);
+          (void) new RBSNoCutoff<SolveImmediate,Gecode::BAB>("BAB",t);
         }
         // Portfolio-based search
         for (unsigned int a=1; a<=4; a++)
@@ -788,6 +901,20 @@ namespace Test {
             (void) new SEBPBS<FailImmediate>("DFS+LDS",false,mt,st);
             (void) new SEBPBS<SolveImmediate>("DFS+LDS",false,mt,st);
           }
+        // Portfolio-based search using RBS
+        for (unsigned int a=1; a<=4; a++)
+          for (unsigned int t=1; t<=2*a; t++)
+            for (unsigned int s=0; s<=1; s++) {
+              (void) new PBSRBS<HasSolutions,Gecode::DFS>("DFS",false,a,t,s);
+              (void) new PBSRBS<HasSolutions,Gecode::LDS>("LDS",false,a,t,s);
+              (void) new PBSRBS<HasSolutions,Gecode::BAB>("BAB",true,a,t,s);
+              (void) new PBSRBS<FailImmediate,Gecode::DFS>("DFS",false,a,t,s);
+              (void) new PBSRBS<FailImmediate,Gecode::LDS>("LDS",false,a,t,s);
+              (void) new PBSRBS<FailImmediate,Gecode::BAB>("BAB",true,a,t,s);
+              (void) new PBSRBS<SolveImmediate,Gecode::DFS>("DFS",false,a,t,s);
+              (void) new PBSRBS<SolveImmediate,Gecode::LDS>("LDS",false,a,t,s);
+              (void) new PBSRBS<SolveImmediate,Gecode::BAB>("BAB",true,a,t,s);
+            }
       }
     };
 

@@ -56,6 +56,8 @@ namespace Gecode { namespace Search { namespace Par {
     void stop(bool s);
     /// Whether search must be stopped
     bool stop(void) const;
+    /// Wheather search must be stopped, independent of any Statistics or Options
+    virtual bool alwaysStops() const;
   };
 
   // Forward declaration
@@ -79,6 +81,8 @@ namespace Gecode { namespace Search { namespace Par {
     Statistics statistics(void) const;
     /// Check whether slave has been stopped
     bool stopped(void) const;
+    /// True if stop object always stops
+    bool willStopImmediately(void) const;
     /// Constrain with better solution \a b
     void constrain(const Space& b);
     /// Perform one run
@@ -175,8 +179,10 @@ namespace Gecode { namespace Search { namespace Par {
     virtual Space* next(void);
     /// Return statistics
     virtual Statistics statistics(void) const;
-    /// Check whether engine has been stopped
+    /// Check whether engine has been stopped. A stopped engine can be restarted
     virtual bool stopped(void) const;
+
+    virtual bool willStopImmediately(void) const;
     /// Constrain future solutions to be better than \a b
     virtual void constrain(const Space& b);
     /// Destructor

@@ -59,7 +59,7 @@ namespace Gecode { namespace Support {
     /// Start timer
     void start(void);
     /// Get time since start of timer
-    double stop(void);
+    double stop(void) const;
   };
 
   inline void
@@ -73,7 +73,7 @@ namespace Gecode { namespace Support {
   }
 
   inline double
-  Timer::stop(void) {
+  Timer::stop(void) const {
 #if   defined(GECODE_USE_GETTIMEOFDAY)
     timeval t1, t;
     if (gettimeofday(&t1, nullptr))

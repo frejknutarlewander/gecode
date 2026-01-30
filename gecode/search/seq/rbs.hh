@@ -58,6 +58,8 @@ namespace Gecode { namespace Search { namespace Seq {
     RestartStop(Stop* s);
     /// Return true if meta engine must be stopped
     virtual bool stop(const Statistics& s, const Options& o);
+    /// Return true if meta engine has stopped
+    virtual bool alwaysStops() const;
     /// Set current limit for the engine to \a l fails
     void limit(const Statistics& s, unsigned long long int l);
     /// Update statistics
@@ -99,8 +101,11 @@ namespace Gecode { namespace Search { namespace Seq {
     virtual Space* next(void);
     /// Return statistics
     virtual Statistics statistics(void) const;
-    /// Check whether engine has been stopped
+    /// Check whether engine has been stopped. A stopped engine can be restarted
     virtual bool stopped(void) const;
+
+    virtual bool willStopImmediately() const;
+
     /// Constrain future solutions to be better than \a b
     virtual void constrain(const Space& b);
     /// Destructor

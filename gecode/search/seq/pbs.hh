@@ -61,6 +61,8 @@ namespace Gecode { namespace Search { namespace Seq {
     void share(SharedStopInfo* ssi);
     /// Return true if portfolio engine must be stopped
     virtual bool stop(const Statistics& s, const Options& o);
+    /// Return true if portfolio engine must be stopped, independent of Statistics or Options
+    virtual bool alwaysStops() const;
   };
 
   /// Runnable slave of a portfolio master
@@ -85,6 +87,8 @@ namespace Gecode { namespace Search { namespace Seq {
     Statistics statistics(void) const;
     /// Check whether slave has been stopped
     bool stopped(void) const;
+
+    bool willStopImmediately(void) const;
     /// Constrain with better solution \a b
     void constrain(const Space& b);
     /// Perform one run
@@ -119,8 +123,10 @@ namespace Gecode { namespace Search { namespace Seq {
     virtual Space* next(void);
     /// Return statistics
     virtual Statistics statistics(void) const;
-    /// Check whether engine has been stopped
+    /// Check whether engine has been stopped. A stopped engine can be restarted
     virtual bool stopped(void) const;
+
+    virtual bool willStopImmediately(void) const;
     /// Constrain future solutions to be better than \a b
     virtual void constrain(const Space& b);
     /// Destructor

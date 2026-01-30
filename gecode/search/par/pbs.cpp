@@ -40,6 +40,11 @@ namespace Gecode { namespace Search { namespace Par {
     return *tostop || ((so != nullptr) && so->stop(s,o));
   }
 
+  bool
+  PortfolioStop::alwaysStops() const {
+    return *tostop || ((so != nullptr) && so->alwaysStops());
+  }
+
 }}}
 
 // STATISTICS: search-par

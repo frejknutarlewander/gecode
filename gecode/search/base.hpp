@@ -57,6 +57,11 @@ namespace Gecode { namespace Search {
     return e->stopped();
   }
   template<class T>
+  forceinline bool
+  Base<T>::willStopImmediately(void) const {
+    return e->willStopImmediately();
+  }
+  template<class T>
   forceinline
   Base<T>::~Base(void) {
     delete e;

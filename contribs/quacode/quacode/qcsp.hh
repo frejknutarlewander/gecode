@@ -254,7 +254,7 @@ namespace Gecode {
     T* next(void);
     /// Return statistics
     Search::Statistics statistics(void) const;
-    /// Check whether engine has been stopped
+    /// Check whether engine has been stopped. A stopped engine can be restarted
     bool stopped(void) const;
     /// Destructor
     ~QDFS(void);

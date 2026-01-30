@@ -38,6 +38,11 @@ namespace Gecode { namespace Search { namespace Seq {
 
   bool
   RestartStop::stop(const Statistics& s, const Options& o) {
+    // Stop if the stop object for the meta engine always says so
+    if ((m_stop != nullptr) && m_stop->alwaysStops()) {
+      e_stopped = false;
+      return true;
+    }
     // Stop if the fail limit for the engine says so
     if (s.fail > l) {
       e_stopped = true;
@@ -145,6 +150,11 @@ namespace Gecode { namespace Search { namespace Seq {
      * missed.
      */
     return e->stopped();
+  }
+
+  bool
+  RBS::willStopImmediately(void) const {
+    return ((stop != nullptr) && stop->alwaysStops()) || e->willStopImmediately();
   }
 
   RBS::~RBS(void) {

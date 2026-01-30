@@ -805,6 +805,8 @@ namespace Gecode { namespace Search {
     Stop(void);
     /// Stop search, if returns true
     virtual bool stop(const Statistics& s, const Options& o) = 0;
+    /// Stop search, if returns true, independent of any Statistics or Options
+    virtual bool alwaysStops() const;
     /// Destructor
     virtual ~Stop(void);
     //@}
@@ -888,6 +890,8 @@ namespace Gecode { namespace Search {
     void reset(void);
     /// Return true if time limit is exceeded
     virtual bool stop(const Statistics& s, const Options& o);
+    /// Return true if time limit is exceeded
+    virtual bool alwaysStops() const;
   };
 
   /**
@@ -924,8 +928,9 @@ namespace Gecode { namespace Search {
     virtual Space* next(void) = 0;
     /// Return statistics
     virtual Statistics statistics(void) const = 0;
-    /// Check whether engine has been stopped
+    /// Check whether engine has been stopped. A stopped engine can be restarted
     virtual bool stopped(void) const = 0;
+    virtual bool willStopImmediately(void) const;
     /// Constrain future solutions to be better than \a b (raises exception)
     virtual void constrain(const Space& b);
     /// Reset engine to restart at space \a s (does nothing)
@@ -959,8 +964,10 @@ namespace Gecode { namespace Search {
     virtual T* next(void);
     /// Return statistics
     virtual Statistics statistics(void) const;
-    /// Check whether engine has been stopped
+    /// Check whether engine has been stopped. A stopped engine can be restarted
     virtual bool stopped(void) const;
+
+    virtual bool willStopImmediately(void) const;
     /// Destructor
     virtual ~Base(void);
   private:

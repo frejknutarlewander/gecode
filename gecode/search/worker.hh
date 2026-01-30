@@ -54,8 +54,10 @@ namespace Gecode { namespace Search {
     void start(void);
     /// Check whether engine must be stopped
     bool stop(const Options& o);
-    /// Check whether engine has been stopped
+    /// Check whether engine has been stopped. A stopped engine can be restarted
     bool stopped(void) const;
+    /// Check weather engine will immediately be stopped upon any restart
+    static bool willStopImmediately(const Options& o);
     /// Reset statistics with root depth \a d
     void reset(unsigned long int d=0);
     /// Record stack depth \a d
@@ -86,6 +88,11 @@ namespace Gecode { namespace Search {
   forceinline bool
   Worker::stopped(void) const {
     return _stopped;
+  }
+
+  forceinline bool
+  Worker::willStopImmediately(const Options& o) {
+    return (o.stop != nullptr) && o.stop->alwaysStops();
   }
 
   forceinline void

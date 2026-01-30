@@ -50,7 +50,7 @@ namespace Gecode { namespace Search { namespace Seq {
     virtual Space* next(void);
     /// Return statistics
     virtual Statistics statistics(void) const;
-    /// Check whether engine has been stopped
+    /// Check whether engine has been stopped. A stopped engine can be restarted
     virtual bool stopped(void) const;
     /// Delete
     virtual ~Dead(void);

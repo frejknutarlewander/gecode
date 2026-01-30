@@ -64,6 +64,10 @@ namespace Gecode { namespace Search { namespace Seq {
   Slave::stopped(void) const {
     return slave->stopped();
   }
+  forceinline bool
+  Slave::willStopImmediately(void) const {
+    return slave->willStopImmediately();
+  }
   forceinline void
   Slave::constrain(const Space& b) {
     slave->constrain(b);
@@ -108,7 +112,7 @@ namespace Gecode { namespace Search { namespace Seq {
         }
         return s;
       }
-      if (slaves[cur].stopped()) {
+      if (slaves[cur].stopped() && !slaves[cur].willStopImmediately()) {
         if (ssi.done) {
           cur++; n_exhausted++;
         } else {
@@ -121,7 +125,7 @@ namespace Gecode { namespace Search { namespace Seq {
         slaves[cur].~Slave();
         slaves[cur] = slaves[--n_slaves];
         if (n_slaves == 1)
-          // Disable stoping by seeting a high limit
+          // Disable stopping by setting a high limit
           ssi.l = ULONG_MAX;
       }
       if (n_exhausted == n_slaves) {
@@ -139,6 +143,12 @@ namespace Gecode { namespace Search { namespace Seq {
   bool
   PBS<best>::stopped(void) const {
     return slave_stop;
+  }
+
+  template<bool best>
+  bool
+  PBS<best>::willStopImmediately(void) const {
+    return n_slaves == 0;
   }
 
   template<bool best>

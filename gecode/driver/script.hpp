@@ -63,7 +63,7 @@ namespace Gecode { namespace Driver {
       : ns((node > 0ULL) ? new Search::NodeStop(node) : nullptr),
         fs((fail > 0ULL) ? new Search::FailStop(fail) : nullptr),
         ts((time > 0.0)  ? new Search::TimeStop(time) : nullptr),
-        rs((restart > 0.0) ? new Search::RestartStop(restart) : nullptr) {
+        rs((restart > 0ULL) ? new Search::RestartStop(restart) : nullptr) {
       sigint = false;
     }
   public:
@@ -84,6 +84,15 @@ namespace Gecode { namespace Driver {
         ((ts != nullptr) && ts->stop(s,o)) ||
         ((rs != nullptr) && rs->stop(s,o));
     }
+    /// Test whether search will always be stopped
+    virtual bool alwaysStops() const {
+      return
+        sigint ||
+        ((ns != nullptr) && ns->alwaysStops()) ||
+        ((fs != nullptr) && fs->alwaysStops()) ||
+        ((ts != nullptr) && ts->alwaysStops()) ||
+        ((rs != nullptr) && rs->alwaysStops());
+    }
     /// Report reason why search has been stopped
     int reason(const Search::Statistics& s, const Search::Options& o) {
       return
@@ -92,6 +101,47 @@ namespace Gecode { namespace Driver {
         (((ts != nullptr) && ts->stop(s,o)) ? SR_TIME : 0) |
         (((rs != nullptr) && rs->stop(s,o)) ? SR_RESTART : 0) |
         (sigint                          ? SR_INT  : 0);
+    }
+    ///
+    unsigned long long int nodeLimit() const {
+      return ns == nullptr ? 0ULL : ns->limit();
+    }
+    unsigned long long int failLimit() const {
+      return ns == nullptr ? 0ULL : fs->limit();
+    }
+    double timeLimit() const {
+      return ts == nullptr ? 0.0 : ts->limit();
+    }
+    unsigned long long int restartLimit() const {
+      return rs == nullptr ? 0ULL : rs->limit();
+    }
+    void nodeLimit(unsigned long long int l) {
+      if (ns == nullptr) {
+        ns = new Search::NodeStop(l);
+      } else {
+        ns->limit(l);
+      }
+    }
+    void failLimit(unsigned long long int l) {
+      if (fs == nullptr) {
+        fs = new Search::FailStop(l);
+      } else {
+        fs->limit(l);
+      }
+    }
+    void timeLimit(double l) {
+      if (ts == nullptr) {
+        ts = new Search::TimeStop(l);
+      } else {
+        ts->limit(l);
+      }
+    }
+    void restartLimit(unsigned long long int l) {
+      if (rs == nullptr) {
+        rs = new Search::RestartStop(l);
+      } else {
+        rs->limit(l);
+      }
     }
     /// Create appropriate stop-object
     static Search::Stop*

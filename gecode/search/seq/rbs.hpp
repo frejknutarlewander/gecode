@@ -45,6 +45,11 @@ namespace Gecode { namespace Search { namespace Seq {
     e_stopped = false;
   }
 
+  forceinline bool
+  RestartStop::alwaysStops() const {
+    return m_stop != nullptr && m_stop->alwaysStops();
+  }
+
   forceinline void
   RestartStop::update(const Search::Statistics& s) {
     m_stat += s;

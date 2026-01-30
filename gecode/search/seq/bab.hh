@@ -76,6 +76,8 @@ namespace Gecode { namespace Search { namespace Seq {
     void reset(Space* s);
     /// Return no-goods
     NoGoods& nogoods(void);
+
+    bool willStopImmediately(void) const;
     /// Destructor
     ~BAB(void);
   };

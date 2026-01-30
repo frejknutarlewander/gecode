@@ -83,7 +83,15 @@ namespace Gecode { namespace Search {
    */
   bool
   TimeStop::stop(const Statistics&, const Options&) {
-    return t.stop() > l;
+    return alwaysStops();
+  }
+
+  /*
+   * True if time limit has passed
+   */
+  bool
+  TimeStop::alwaysStops() const {
+      return t.stop() > l;
   }
 
   /*
