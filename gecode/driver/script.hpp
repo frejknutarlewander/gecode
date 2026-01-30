@@ -102,47 +102,6 @@ namespace Gecode { namespace Driver {
         (((rs != nullptr) && rs->stop(s,o)) ? SR_RESTART : 0) |
         (sigint                          ? SR_INT  : 0);
     }
-    ///
-    unsigned long long int nodeLimit() const {
-      return ns == nullptr ? 0ULL : ns->limit();
-    }
-    unsigned long long int failLimit() const {
-      return ns == nullptr ? 0ULL : fs->limit();
-    }
-    double timeLimit() const {
-      return ts == nullptr ? 0.0 : ts->limit();
-    }
-    unsigned long long int restartLimit() const {
-      return rs == nullptr ? 0ULL : rs->limit();
-    }
-    void nodeLimit(unsigned long long int l) {
-      if (ns == nullptr) {
-        ns = new Search::NodeStop(l);
-      } else {
-        ns->limit(l);
-      }
-    }
-    void failLimit(unsigned long long int l) {
-      if (fs == nullptr) {
-        fs = new Search::FailStop(l);
-      } else {
-        fs->limit(l);
-      }
-    }
-    void timeLimit(double l) {
-      if (ts == nullptr) {
-        ts = new Search::TimeStop(l);
-      } else {
-        ts->limit(l);
-      }
-    }
-    void restartLimit(unsigned long long int l) {
-      if (rs == nullptr) {
-        rs = new Search::RestartStop(l);
-      } else {
-        rs->limit(l);
-      }
-    }
     /// Create appropriate stop-object
     static Search::Stop*
     create(unsigned long long int node,
